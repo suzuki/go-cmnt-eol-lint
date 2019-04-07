@@ -1,0 +1,2 @@
+export ALLOWED_EOLS=".!){}]"
+export MIN_WORDS=5
