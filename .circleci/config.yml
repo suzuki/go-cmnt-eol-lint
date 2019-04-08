@@ -35,6 +35,12 @@ workflows:
   build-workflow:
     jobs:
       - dep:
+          filters:
+            branches:
+              only: /.*/
       - test:
           requires:
             - dep
+          filters:
+            branches:
+              only: /.*/
