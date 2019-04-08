@@ -3,7 +3,7 @@ version: 2.1
 defaults: &defaults
   working_directory: /app
   docker:
-    - images: golang:1.12
+    - image: golang:1.12
 
 jobs:
   dep:
@@ -32,8 +32,15 @@ jobs:
 
 workflows:
   version: 2
-  jobs:
-    - dep:
-    - test:
-        requires:
-          - dep
+  build-workflow:
+    jobs:
+      - dep:
+          filters:
+            branches:
+              only: /.*/
+      - test:
+          requires:
+            - dep
+          filters:
+            branches:
+              only: /.*/
