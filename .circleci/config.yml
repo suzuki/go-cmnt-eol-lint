@@ -32,8 +32,9 @@ jobs:
 
 workflows:
   version: 2
-  jobs:
-    - dep:
-    - test:
-        requires:
-          - dep
+  build-workflow:
+    jobs:
+      - dep:
+      - test:
+          requires:
+            - dep
