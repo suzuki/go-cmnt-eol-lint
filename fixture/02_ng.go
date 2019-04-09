@@ -7,18 +7,23 @@ type Interface02 interface {
 	Method()
 }
 
-// Struct02 comment
+// Struct02 is a structure for checking the comment eol
 type Struct02 struct {
 	// this comment is not checked
 	Field int64
 }
 
-// Method comment
+// Method is a method for checking the comment eol
 func (s *Struct02) Method() {
 	// this comment is not checked
 }
 
-// main02 comment
+// main02 is a main func for checking the comment eol
 func main02() {
-	// comment in main does not check
+	// comment in main02 does not check
+}
+
+// short comment is no-check
+func func02() {
+	// comment in func02 does not check
 }

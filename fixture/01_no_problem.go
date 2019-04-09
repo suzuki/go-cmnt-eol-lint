@@ -7,18 +7,18 @@ type Interface01 interface {
 	Method()
 }
 
-// Struct01 comment!
+// Struct01 is a structure for checking the comment eol!
 type Struct01 struct {
 	// this comment is not checked
 	Field int64
 }
 
-// Method (comment)
+// Method is a method for checking the comment (eol)
 func (s *Struct01) Method() {
 	// this comment is not checked
 }
 
-// main01 [comment]
+// main01 is a main func for checking the comment [eol]
 func main01() {
-	// comment in main does not check
+	// comment in main01 does not check
 }
