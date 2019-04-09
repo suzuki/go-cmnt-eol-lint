@@ -2,7 +2,6 @@ package linter
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/suzuki/go-cmnt-eol-lint/src/env"
@@ -21,9 +20,9 @@ func Test_Linter_LintFile(t *testing.T) {
 			filename: "02_ng.go",
 			expectedComments: []string{
 				"Interface02 comment 1st line\nInterface02 comment 2nd line\n",
-				"Struct02 comment\n",
-				"Method comment\n",
-				"main02 comment\n",
+				"Struct02 is a structure for checking the comment eol\n",
+				"Method is a method for checking the comment eol\n",
+				"main02 is a main func for checking the comment eol\n",
 			},
 		},
 	}
@@ -40,8 +39,6 @@ func Test_Linter_LintFile(t *testing.T) {
 			if err != nil {
 				t.Fatalf("LintFile could not lint. path=%q err=%q", path, err)
 			}
-
-			fmt.Printf("results: %v", results)
 
 			if len(results) != len(tt.expectedComments) {
 				t.Fatalf("Length of results is not match. want=%d got=%d", len(tt.expectedComments), len(results))

@@ -67,6 +67,10 @@ func (l *defaultLinter) hasAllowedEOL(comment string) bool {
 	return false
 }
 
+func (l *defaultLinter) hasMinWords(comment string) bool {
+	return len(strings.Fields(comment)) >= l.config.MinWords
+}
+
 func (l *defaultLinter) lint(path string, src []byte) ([]*Result, error) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, src, parser.ParseComments)
@@ -79,16 +83,26 @@ func (l *defaultLinter) lint(path string, src []byte) ([]*Result, error) {
 	for _, decl := range f.Decls {
 		switch v := decl.(type) {
 		case *ast.GenDecl:
+			comment := v.Doc.Text()
+			if !l.hasMinWords(comment) {
+				continue
+			}
+
 			// GenDecl means `import`, `const`, `type`, `var`
-			if !l.hasAllowedEOL(v.Doc.Text()) {
-				r := NewResult(fset.Position(v.Pos()), v.Doc.Text())
+			if !l.hasAllowedEOL(comment) {
+				r := NewResult(fset.Position(v.Pos()), comment)
 				results = append(results, r)
 			}
 
 		case *ast.FuncDecl:
+			comment := v.Doc.Text()
+			if !l.hasMinWords(comment) {
+				continue
+			}
+
 			// FuncDecl means `func`
-			if !l.hasAllowedEOL(v.Doc.Text()) {
-				r := NewResult(fset.Position(v.Pos()), v.Doc.Text())
+			if !l.hasAllowedEOL(comment) {
+				r := NewResult(fset.Position(v.Pos()), comment)
 				results = append(results, r)
 			}
 		}
