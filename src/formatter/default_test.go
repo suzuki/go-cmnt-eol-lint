@@ -30,7 +30,7 @@ func Test_Default_Format(t *testing.T) {
 					Comment: "test comment",
 				},
 			},
-			expected: "file1.go:10:11: test comment\n",
+			expected: "file1.go:10:11: the end of the comment should be a period. got=\"test comment\"\n",
 		},
 		"Have 2 Results": {
 			results: []*linter.Result{
@@ -53,7 +53,7 @@ func Test_Default_Format(t *testing.T) {
 					Comment: "test comment",
 				},
 			},
-			expected: "file1.go:10:11: test comment\nfile2.go:20:21: test comment\n",
+			expected: "file1.go:10:11: the end of the comment should be a period. got=\"test comment\"\nfile2.go:20:21: the end of the comment should be a period. got=\"test comment\"\n",
 		},
 	}
 

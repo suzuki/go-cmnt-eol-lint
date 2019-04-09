@@ -1,7 +1,7 @@
 package formatter
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/suzuki/go-cmnt-eol-lint/src/linter"
 )
@@ -21,7 +21,7 @@ func (f *defaultFormatter) Format(results []*linter.Result) (string, error) {
 	var output string
 
 	for _, r := range results {
-		output += strings.ReplaceAll(r.String(), "\n", " ")
+		output += fmt.Sprintf("%s: the end of the comment should be a period. got=%q", r.GetPosition(), r.GetComment())
 		output += "\n"
 	}
 
