@@ -23,7 +23,7 @@ func main02() {
 	// comment in main02 does not check
 }
 
-// short comment is no-check
+// short-comment no-check
 func func02() {
 	// comment in func02 does not check
 }
