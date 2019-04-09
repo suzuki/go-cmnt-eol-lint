@@ -13,7 +13,7 @@ var (
 
 type Config struct {
 	AllowedEOLs string `envconfig:"ALLOWED_EOLS" default:".!){}]"`
-	MinWords    int    `envconfig:"MIN_WORDS" default:"5"`
+	MinWords    int    `envconfig:"MIN_WORDS" default:"3"`
 }
 
 func newConfig() *Config {
