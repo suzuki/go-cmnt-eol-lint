@@ -30,6 +30,16 @@ jobs:
           name: Test
           command: make test
 
+  build:
+    <<: *defaults
+    steps:
+       - setup_remote_docker
+       - run: |
+           TAG=0.1.$CIRCLE_BUILD_NUM
+           docker build -t zatsubun/go-cmnt-eol-lint:$TAG .
+           docker login -u $DOCKER_USER -p $DOCKER_PASS
+           docker push zatsubun/go-cmnt-eol-lint:$TAG
+
 workflows:
   version: 2
   build-workflow:
@@ -41,6 +51,14 @@ workflows:
       - test:
           requires:
             - dep
+          filters:
+            branches:
+              only: /.*/
+      - build:
+          requires:
+            - dep
+            - test
+          context: org-global
           filters:
             branches:
               only: /.*/
