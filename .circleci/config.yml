@@ -88,18 +88,24 @@ workflows:
           filters:
             branches:
               only: /.*/
+            tags:
+              only: /v.*/
       - test:
           requires:
             - dep
           filters:
             branches:
               only: /.*/
+            tags:
+              only: /v.*/
       - build:
           requires:
             - dep
           filters:
             branches:
               only: /.*/
+            tags:
+              only: /v.*/
       - push:
           requires:
             - dep
@@ -110,4 +116,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /.*/
+              only: /v.*/
