@@ -29,11 +29,12 @@ func main() {
 		path := path // https://golang.org/doc/faq#closures_and_goroutines
 
 		st, err := os.Stat(path)
-		if st.IsDir() {
-			continue
-		}
 		if err != nil {
 			printError(err)
+			continue
+		}
+		if st.IsDir() {
+			continue
 		}
 
 		eg.Go(func() error {
