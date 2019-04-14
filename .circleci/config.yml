@@ -13,6 +13,9 @@ references:
       curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
       tar -xz -C /tmp -f /tmp/docker-$VER.tgz
       mv /tmp/docker/* /usr/bin
+  create_workspace: &create_workspace
+    name: Create workspace
+    command: mkdir -p /tmp/workspace/{artifacts,pkg}
 
 jobs:
   dep:
@@ -39,7 +42,7 @@ jobs:
           name: Test
           command: make test
 
-  build:
+  build-container:
     <<: *defaults
     steps:
       - checkout
@@ -47,18 +50,35 @@ jobs:
           key: v1-gosum-{{ checksum "go.sum" }}
       - setup_remote_docker
       - run: *install_docker_client
+      - run: *create_workspace
       - run:
           name: Build a container
           command: docker build -t zatsubun/go-cmnt-eol-lint:latest .
       - run:
           name: Save an image
-          command: docker image save zatsubun/go-cmnt-eol-lint:latest > ./artifacts/docker-image.tar
+          command: docker image save zatsubun/go-cmnt-eol-lint:latest > /tmp/workspace/artifacts/docker-image.tar
       - persist_to_workspace:
-          root: .
+          root: /tmp/workspace
           paths:
-            - ./artifacts/docker-image.tar
+            - artifacts/docker-image.tar
+  build-pkg:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-gosum-{{ checksum "go.sum" }}
+      - run: *create_workspace
+      - run:
+          name: Build pkgs
+          command: |
+            make pkg
+            cp pkg/* /tmp/workspace/pkg/
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - pkg/*
 
-  push:
+  push-container:
     <<: *defaults
     steps:
       - checkout
@@ -67,10 +87,10 @@ jobs:
       - setup_remote_docker
       - run: *install_docker_client
       - attach_workspace:
-          at: ./artifacts
+          at: /tmp/workspace
       - run:
           name: Load an image from tar
-          command: docker load -i ./artifacts/docker-image.tar
+          command: docker load -i /tmp/workspace/artifacts/docker-image.tar
       - run:
           name: Tag to latest
           command: docker tag zatsubun/go-cmnt-eol-lint:latest zatsubun/go-cmnt-eol-lint:$CIRCLE_TAG
@@ -79,6 +99,23 @@ jobs:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push zatsubun/go-cmnt-eol-lint
+
+  github-release:
+    docker:
+      - image: cibuild:/github:0.12
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Publish to GitHub Releases
+          command: |
+            VERSION=$CIRCLE_TAG
+            ghr -t $GITHUB_TOKEN \
+                -u $CIRCLE_PROJECT_USERNAME \
+                -r $CIRCLE_PROJECT_REPONAME \
+                -c CIRCLE_SHA1 \
+                -delete \
+                $VERSION /tmp/workspace/pkg
 
 workflows:
   version: 2
@@ -98,7 +135,7 @@ workflows:
               only: /.*/
             tags:
               only: /v.*/
-      - build:
+      - build-container:
           requires:
             - dep
           filters:
@@ -106,12 +143,30 @@ workflows:
               only: /.*/
             tags:
               only: /v.*/
-      - push:
+      - build-pkg:
+          requires:
+            - dep
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /v.*/
+      - push-container:
           requires:
             - dep
             - test
-            - build
+            - build-container
           context: org-global
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v.*/
+      - github-release:
+          requires:
+            - dep
+            - test
+            - build-pkg
           filters:
             branches:
               ignore: /.*/
