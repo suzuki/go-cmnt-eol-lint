@@ -52,11 +52,11 @@ jobs:
           command: docker build -t zatsubun/go-cmnt-eol-lint:latest .
       - run:
           name: Save an image
-          command: docker image save zatsubun/go-cmnt-eol-lint:latest > ./docker-image.tar
+          command: docker image save zatsubun/go-cmnt-eol-lint:latest > ./artifacts/docker-image.tar
       - persist_to_workspace:
           root: .
           paths:
-            - ./docker-image.tar
+            - ./artifacts/docker-image.tar
 
   push:
     <<: *defaults
@@ -67,10 +67,10 @@ jobs:
       - setup_remote_docker
       - run: *install_docker_client
       - attach_workspace:
-          at: .
+          at: ./artifacts
       - run:
           name: Load an image from tar
-          command: docker load -i ./docker-image.tar
+          command: docker load -i ./artifacts/docker-image.tar
       - run:
           name: Tag to latest
           command: docker tag zatsubun/go-cmnt-eol-lint:latest zatsubun/go-cmnt-eol-lint:$CIRCLE_TAG
