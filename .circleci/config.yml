@@ -102,7 +102,7 @@ jobs:
 
   github-release:
     docker:
-      - image: cibuild:/github:0.12
+      - image: cibuild/github:0.12
     steps:
       - attach_workspace:
           at: /tmp/workspace
