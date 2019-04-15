@@ -167,6 +167,7 @@ workflows:
             - dep
             - test
             - build-pkg
+          context: org-global
           filters:
             branches:
               ignore: /.*/
